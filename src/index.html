@@ -17,6 +17,7 @@
       background-color: white;
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     }
+
     .hidden {
       display: none;
     }
@@ -24,7 +25,7 @@
 </head>
 
 <body>
-  <div class="alert alert-primary"  id="notification" class="hidden" role="alert">
+  <div class="alert alert-primary" id="notification" class="hidden" role="alert">
     <span id="message"></span>
     <button id="close-button" onClick="closeNotification()">
       Close
@@ -35,10 +36,10 @@
   </div>
 
 
-  <div class="card"  id="app">
+  <div class="card" id="app">
     <div class="card-body">
       <ul class="list-group">
-        
+
         <li class="list-group-item">Sales <b> {{sale}} </b></li>
         <li class="list-group-item">Void <b>{{nonprop}}</b></li>
         <li class="list-group-item">Du <b>{{du}}</b></li>
@@ -49,7 +50,7 @@
       <button v-on:click="shownewWindow" class="btn btn-primary btn-block">Voids</button>
       <button v-on:click="shownewSales" class="btn btn-primary btn-block">Sales</button>
       <button v-on:click="shownewSalesD" class="btn btn-primary btn-block">Sales Dilvery</button>
-      <button v-on:click="shownewSalesWB" class="btn btn-primary btn-block">Sales  Custom</button>
+      <button v-on:click="shownewSalesWB" class="btn btn-primary btn-block">Sales Custom</button>
       <button v-on:click="shownewSalesDWB" class="btn btn-primary btn-block">Sales Dilvery Custom</button>
       <button v-on:click="shownewVoidWB" class="btn btn-primary btn-block">Void Custom</button>
     </div>
@@ -59,14 +60,14 @@
   <script src="../Content/vue.js"></script>
 
   <script src="../Content/axios.min.js"></script>
-  <script> require('./renderer.js')</script>
+  <script> require('../renderer.js')</script>
   <script>
 
 
     const notification = document.getElementById('notification');
-const message = document.getElementById('message');
-const restartButton = document.getElementById('restart-button');
-    var ipcRenderer    = require('electron').ipcRenderer
+    const message = document.getElementById('message');
+    const restartButton = document.getElementById('restart-button');
+    var ipcRenderer = require('electron').ipcRenderer
     var app = new Vue({
       el: '#app',
       data() {
@@ -82,7 +83,7 @@ const restartButton = document.getElementById('restart-button');
         }
       },
       fetching() {
-        
+
       },
       methods: {
         fetching: function (event) {
@@ -90,7 +91,7 @@ const restartButton = document.getElementById('restart-button');
           var today = new Date();
           var dd = today.getDate();
           var mm = today.getMonth() + 1; //January is 0!
-  
+
           var yyyy = today.getFullYear();
           if (dd < 10) {
             dd = '0' + dd;
@@ -99,15 +100,15 @@ const restartButton = document.getElementById('restart-button');
             mm = '0' + mm;
           }
           var today = yyyy + '-' + mm + '-' + dd;
-  
+
           axios
             .get('http://94.200.123.222:3434/dailysale1/a')
             .then(response => (this.sale = response.data.data[0][0].totalSale))
-  
+
           axios
             .get('http://94.200.123.222:3434/void/' + today)
-            .then(response => (this.nonprop = response.data.data[0].reduce((a,b) => a + b.amount, 0)))
-  
+            .then(response => (this.nonprop = response.data.data[0].reduce((a, b) => a + b.amount, 0)))
+
           axios
             .get('http://94.200.123.222:3434/checkdu')
             .then(response => (this.du = response.data.data[0][0].amount))
@@ -123,7 +124,7 @@ const restartButton = document.getElementById('restart-button');
           axios
             .get('http://94.200.123.222:3131/')
             .then(response => {
-            this.duB = response.data.dsclosing
+              this.duB = response.data.dsclosing
               this.esB = response.data.euclosing
             })
         },
@@ -131,42 +132,42 @@ const restartButton = document.getElementById('restart-button');
           // `this` inside methods points to the Vue instance
           ipcRenderer.send('Void')
           //window.open('./void.html', '_blank', 'nodeIntegration=no')
-        
+
         },
         shownewSales: function (event) {
           // `this` inside methods points to the Vue instance
           ipcRenderer.send('Sales')
           //window.open('./void.html', '_blank', 'nodeIntegration=no')
-        
+
         },
         shownewSalesD: function (event) {
           // `this` inside methods points to the Vue instance
           ipcRenderer.send('SalesD')
           //window.open('./void.html', '_blank', 'nodeIntegration=no')
-        
+
         },
         shownewSalesDWB: function (event) {
           // `this` inside methods points to the Vue instance
           ipcRenderer.send('SalesDWB')
           //window.open('./void.html', '_blank', 'nodeIntegration=no')
-        
+
         },
         shownewSalesWB: function (event) {
           // `this` inside methods points to the Vue instance
           ipcRenderer.send('SalesWB')
           //window.open('./void.html', '_blank', 'nodeIntegration=no')
-        
+
         },
         shownewVoidWB: function (event) {
           // `this` inside methods points to the Vue instance
           ipcRenderer.send('VoidWB')
           //window.open('./void.html', '_blank', 'nodeIntegration=no')
-        
+
         },
       },
-     
-      
-     
+
+
+
     })
     ipcRenderer.on('update_available', () => {
       ipcRenderer.removeAllListeners('update_available');
@@ -185,8 +186,8 @@ const restartButton = document.getElementById('restart-button');
     function restartApp() {
       ipcRenderer.send('restart_app');
     }
-    setInterval(function(){ app.fetching() }, 3000);
-    
+    setInterval(function () { app.fetching() }, 3000);
+
   </script>
 </body>
 
