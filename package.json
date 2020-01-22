@@ -1,20 +1,26 @@
 {
-	"name": "Dominion App",
-	"version": "1.0.1",
-	"description": "App for Dominion Stores",
+	"name": "electron-quick-start",
+	"version": "1.0.2",
+	"description": "A minimal Electron application",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
 		"build": "electron-builder build --win --publish never",
 		"deploy": "electron-builder build --win --publish always"
 	},
-	"keywords": [ "Electron", "quick", "start", "tutorial", "demo" ],
+	"keywords": [
+		"Electron",
+		"quick",
+		"start",
+		"tutorial",
+		"demo"
+	],
 	"author": "GitHub",
 	"license": "CC0-1.0",
 	"devDependencies": {
 		"electron": "^7.1.7",
 		"electron-packager": "^14.1.1",
-		"electron-builder": "^22.2.0"
+    "electron-builder": "^22.2.0"
 	},
 	"dependencies": {
 		"electron-updater": "^4.2.0",

@@ -85,6 +85,10 @@ ipcMain.on('VoidWB',()=>{
 ipcMain.on('restart_app', () => {
 	autoUpdater.quitAndInstall();
   });
+
+  ipcMain.on('app_version', (event) => {
+	event.sender.send('app_version', { version: app.getVersion() });
+  });
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
