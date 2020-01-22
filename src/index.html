@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-  <title>App</title>
+  <title id="version">App</title>
   <link rel="stylesheet" href="../Content/bootstrap.min.css" crossorigin="anonymous">
   <Style>
 
@@ -16,7 +16,8 @@
 
 <body>
   <p id="version"></p>
-  <div class="alert alert-primary" id="notification" class="hidden" role="alert">
+  Latest and Greatest
+  <div class="alert alert-primary hidden" id="notification" role="alert">
     <p id="message"></p>
     <button id="close-button" class="btn btn-none" onClick="closeNotification()">
       Close
