@@ -1,11 +1,12 @@
 {
 	"name": "electron-quick-start",
-	"version": "1.0.2",
+	"version": "1.0.4",
 	"description": "A minimal Electron application",
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
 		"build": "electron-builder build --win --publish never",
+		"push": "git add . && git commit -m 'changes' && git push origin master",
 		"deploy": "electron-builder build --win --publish always"
 	},
 	"keywords": [
