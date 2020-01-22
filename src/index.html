@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+  <title>App</title>
+  <link rel="stylesheet" href="../Content/bootstrap.min.css" crossorigin="anonymous">
+  <Style>
+    #notification {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 200px;
+      padding: 20px;
+      border-radius: 5px;
+      background-color: white;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    }
+    .hidden {
+      display: none;
+    }
+  </Style>
+</head>
+
+<body>
+  <div id="notification" class="hidden">
+    <p id="message"></p>
+    <button id="close-button" onClick="closeNotification()">
+      Close
+    </button>
+    <button id="restart-button" onClick="restartApp()" class="hidden">
+      Restart
+    </button>
+  </div>
+
+  <div class="card"  id="app">
+    <div class="card-body">
+      <ul class="list-group">
+        
+        <li class="list-group-item">Sales <b> {{sale}} </b></li>
+        <li class="list-group-item">Void <b>{{nonprop}}</b></li>
+        <li class="list-group-item">Du <b>{{du}}</b></li>
+        <li class="list-group-item">Du B<b>{{duB - duu}}</b></li>
+        <li class="list-group-item">Es <b>{{es}}</b></li>
+        <li class="list-group-item">Es B <b>{{esB - ess}}</b></li>
+      </ul>
+      <button v-on:click="shownewWindow" class="btn btn-primary btn-block">Voids</button>
+      <button v-on:click="shownewSales" class="btn btn-primary btn-block">Sales</button>
+      <button v-on:click="shownewSalesD" class="btn btn-primary btn-block">Sales Dilvery</button>
+      <button v-on:click="shownewSalesWB" class="btn btn-primary btn-block">Sales  Custom</button>
+      <button v-on:click="shownewSalesDWB" class="btn btn-primary btn-block">Sales Dilvery Custom</button>
+      <button v-on:click="shownewVoidWB" class="btn btn-primary btn-block">Void Custom</button>
+    </div>
+  </div>
+  <!-- You can also require other files to run in this process -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+  <script src="../Content/vue.js"></script>
+
+  <script src="../Content/axios.min.js"></script>
+  <script> require('./renderer.js')</script>
+  <script>
+
+
+    const notification = document.getElementById('notification');
+const message = document.getElementById('message');
+const restartButton = document.getElementById('restart-button');
+    var ipcRenderer    = require('electron').ipcRenderer
+    var app = new Vue({
+      el: '#app',
+      data() {
+        return {
+          sale: null,
+          nonprop: null,
+          du: null,
+          duu: null,
+          duB: null,
+          es: null,
+          ess: null,
+          esB: null,
+        }
+      },
+      fetching() {
+        
+      },
+      methods: {
+        fetching: function (event) {
+          console.log('Updating 🎇🎇🎇')
+          var today = new Date();
+          var dd = today.getDate();
+          var mm = today.getMonth() + 1; //January is 0!
+  
+          var yyyy = today.getFullYear();
+          if (dd < 10) {
+            dd = '0' + dd;
+          }
+          if (mm < 10) {
+            mm = '0' + mm;
+          }
+          var today = yyyy + '-' + mm + '-' + dd;
+  
+          axios
+            .get('http://94.200.123.222:3434/dailysale1/a')
+            .then(response => (this.sale = response.data.data[0][0].totalSale))
+  
+          axios
+            .get('http://94.200.123.222:3434/void/' + today)
+            .then(response => (this.nonprop = response.data.data[0].reduce((a,b) => a + b.amount, 0)))
+  
+          axios
+            .get('http://94.200.123.222:3434/checkdu')
+            .then(response => (this.du = response.data.data[0][0].amount))
+          axios
+            .get('http://94.200.123.222:3434/checkes')
+            .then(response => (this.es = response.data.data[0][0].amount))
+          axios
+            .get('http://94.200.123.222:3434/dd')
+            .then(response => (this.duu = response.data.data[0][0].amount == null ? 0 : response.data.data[0][0].amount))
+          axios
+            .get('http://94.200.123.222:3434/ee')
+            .then(response => (this.ess = response.data.data[0][0].amount == null ? 0 : response.data.data[0][0].amount))
+          axios
+            .get('http://94.200.123.222:3131/')
+            .then(response => {
+            this.duB = response.data.dsclosing
+              this.esB = response.data.euclosing
+            })
+        },
+        shownewWindow: function (event) {
+          // `this` inside methods points to the Vue instance
+          ipcRenderer.send('Void')
+          //window.open('./void.html', '_blank', 'nodeIntegration=no')
+        
+        },
+        shownewSales: function (event) {
+          // `this` inside methods points to the Vue instance
+          ipcRenderer.send('Sales')
+          //window.open('./void.html', '_blank', 'nodeIntegration=no')
+        
+        },
+        shownewSalesD: function (event) {
+          // `this` inside methods points to the Vue instance
+          ipcRenderer.send('SalesD')
+          //window.open('./void.html', '_blank', 'nodeIntegration=no')
+        
+        },
+        shownewSalesDWB: function (event) {
+          // `this` inside methods points to the Vue instance
+          ipcRenderer.send('SalesDWB')
+          //window.open('./void.html', '_blank', 'nodeIntegration=no')
+        
+        },
+        shownewSalesWB: function (event) {
+          // `this` inside methods points to the Vue instance
+          ipcRenderer.send('SalesWB')
+          //window.open('./void.html', '_blank', 'nodeIntegration=no')
+        
+        },
+        shownewVoidWB: function (event) {
+          // `this` inside methods points to the Vue instance
+          ipcRenderer.send('VoidWB')
+          //window.open('./void.html', '_blank', 'nodeIntegration=no')
+        
+        },
+      },
+     
+      
+     
+    })
+    ipcRenderer.on('update_available', () => {
+      ipcRenderer.removeAllListeners('update_available');
+      message.innerText = 'A new update is available. Downloading now...';
+      notification.classList.remove('hidden');
+    });
+    ipcRenderer.on('update_downloaded', () => {
+      ipcRenderer.removeAllListeners('update_downloaded');
+      message.innerText = 'Update Downloaded. It will be installed on restart. Restart now?';
+      restartButton.classList.remove('hidden');
+      notification.classList.remove('hidden');
+    });
+    function closeNotification() {
+      notification.classList.add('hidden');
+    }
+    function restartApp() {
+      ipcRenderer.send('restart_app');
+    }
+    setInterval(function(){ app.fetching() }, 3000);
+    
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../Content/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.20/b-1.6.1/b-html5-1.6.1/r-2.2.3/sc-2.0.1/sl-1.3.1/datatables.min.css"/>
+
+
+    <title>Hello, world!</title>
+</head>
+
+<body>
+    <div id="app" >
+
+        <table id="table_id" class="display table table-striped" >
+            <thead>
+                <tr>
+                    <th v-for="item in datacol">{{ item }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in data">
+                    <td v-for="col in datacol">{{ item[col] }}</td>
+                    <!-- <td>{{item.bill_hdr_key	}}</td>
+                    <td>{{item.bill_sale_date}}</td>
+                    <td>{{item.reason_cancel}}</td>
+                    <td>{{item.bill_end_datetime}}</td>
+                    <td>{{item.bill_no}}</td>
+                    <td>{{item.bill_serial_no}}</td>
+                    <td>{{item.closed_by}}</td>
+                    <td>{{item.bill_amt}}</td>
+                    <td>{{item.bill_paid_amt	}}</td>
+                    <td>{{item.bill_dtl_row_id	}}</td>
+                    <td>{{item.prod_key	}}</td>
+                    <td>{{item.selling_price	}}</td>
+                    <td>{{item.qty	}}</td>
+                    <td>{{item.amount	}}</td>
+                    <td>{{item.ordered_by	}}</td>
+                    <td>{{item.entry_datetime		}}</td>
+                    <td>{{item.prod_default_desc	}}</td>
+                    <td>{{item.item_net_sales	}}</td>
+                    <td>{{item.prod_cost}}</td>
+                    <td>{{item.reason_void}}</td>
+                    <td>{{item.prd_barcd	}}</td>
+                    <td>{{item.trans_hdr_id	}}</td>
+                    <td>{{item.inv_loc_name}}</td>
+                    <td>{{item.authorized_by_name	}}</td>
+                    <td>{{item.inv_loc_key}}</td>
+                    <td>{{item.no_vat_amt}}</td> -->
+
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.20/b-1.6.1/b-html5-1.6.1/r-2.2.3/sc-2.0.1/sl-1.3.1/datatables.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.3.1/js/dataTables.buttons.min.js"></script> 
+
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.3.1/js/buttons.html5.min.js"></script>
+       
+        <script src="../Content/axios.min.js"></script>
+    <script src="../Content/vue.js"></script>
+
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    data: null,
+                    datacol: null,
+                }
+            },
+            mounted() {
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1; //January is 0!
+
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+                var today = yyyy + '-' + mm + '-' + dd;
+                axios
+                    .get('http://94.200.123.222:3434/void/' + today)
+                    .then(response => {
+                        console.log(response.data.data[0])
+                        this.data = response.data.data[0]
+                        var myContacts = response.data.data[0]
+                        var col = []; // define an empty array
+                        for (var i = 0; i < myContacts.length; i++) {
+                            for (var key in myContacts[i]) {
+                                if (col.indexOf(key) === -1) {
+                                    col.push(key);
+                                }
+                            }
+                        }
+                        this.datacol = col
+                        console.table(this.data)
+                        $(document).ready(function () {
+                            $('#table_id').DataTable({
+                                order: false,
+                                "bDestroy": true,
+                                responsive: true,
+                                dom: 'Bfrtip',
+                                buttons: [
+                                    'copyHtml5',
+                                    'excelHtml5',
+                                    'csvHtml5',
+                                    'pdfHtml5'
+                                ]
+                            });
+                        });
+
+                    })
+
+
+            },
+            methods: {
+                fetching: function (event) {
+                    console.log('Updating 🎇🎇🎇')
+                    var today = new Date();
+                    var dd = today.getDate();
+                    var mm = today.getMonth() + 1; //January is 0!
+
+                    var yyyy = today.getFullYear();
+                    if (dd < 10) {
+                        dd = '0' + dd;
+                    }
+                    if (mm < 10) {
+                        mm = '0' + mm;
+                    }
+                    var today = yyyy + '-' + mm + '-' + dd;
+
+                    axios
+                        .get('http://94.200.123.222:3434/dailysale1/a')
+                        .then(response => (this.sale = response.data.data[0][0].totalSale))
+
+                }
+
+            },
+
+
+
+        })
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.20/b-1.6.1/b-html5-1.6.1/r-2.2.3/sc-2.0.1/sl-1.3.1/datatables.min.css"/>
+
+
+    <title>Hello, world!</title>
+</head>
+
+<body>
+
+    <div id="app" >
+
+        
+        <div class="container">
+            <input  @input="startInput($event.target.value)" class="form-group" type="date" name="start">
+            <input  @input="endInput($event.target.value)" class="form-group" type="date" name="end">
+            <button v-on:click="fetching1()" class="btn btn-primary ">Search</button>
+        </div>
+            
+        <table id="table_id" class="display table table-striped" >
+            <thead>
+                <tr>
+                    <th v-for="item in datacol">{{ item }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in data">
+                    <td v-for="col in datacol">{{ item[col] }}</td>
+                 
+
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.3.1/js/dataTables.buttons.min.js"></script> 
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.3.1/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.20/b-1.6.1/b-html5-1.6.1/r-2.2.3/sc-2.0.1/sl-1.3.1/datatables.min.js"></script>
+
+    <script src="../Content/axios.min.js"></script>
+    <script src="../Content/vue.js"></script>
+
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    data: null,
+                    datacol: null,
+                    inputDataS : null,
+                    inputDataE : null
+                }
+            },
+            mounted() {
+               
+            },
+            
+            methods: {
+                fetching1 (){
+                   this.fetching()
+                },
+                startInput(value) {
+                    this.inputDataS = value;
+                  },
+                  endInput(value) {
+                    this.inputDataE = value;
+                  },
+                fetching: function (event) {
+                    let SQL = 'SELECT TOP (1000) [bill_hdr_key]      ,[bill_sale_date]   ,[reason_cancel],      [bill_end_datetime] , [bill_no]      ,[bill_serial_no]      ,[closed_by]      ,[bill_amt]       ,[bill_paid_amt]      ,[bill_dtl_row_id]      ,[prod_key]      ,[selling_price]      ,[qty]      ,[amount]      ,[ordered_by]      ,[entry_datetime]       ,[prod_default_desc]       ,[item_net_sales]          ,[prod_cost]      ,[reason_void]      ,[prd_barcd]      ,[trans_hdr_id]      ,[inv_loc_name]      ,[authorized_by_name]      ,[inv_loc_key]           ,[no_vat_amt]  FROM [CUBES].[dbo].[vw_product_sales_ref_void_cancel]  where bill_sale_date between %27'+this.inputDataS+'%27 and %27'+this.inputDataE+'%27  order by bill_start_datetime desc'
+                    console.log(SQL)
+                    SQL = encodeURIComponent(SQL)
+                     axios
+                         .get('http://94.200.123.222:3434/anyQuery/' + SQL)
+                         .then(response => {
+
+                            if(!arraysEqual(this.data,response.data.msg[0])){
+                                this.data = response.data.msg[0]
+                                var myContacts = response.data.msg[0]
+                                var col = []; // define an empty array
+                                for (var i = 0; i < myContacts.length; i++) {
+                                    for (var key in myContacts[i]) {
+                                        if (col.indexOf(key) === -1) {
+                                            col.push(key);
+                                        }
+                                    }
+                                }
+                                this.datacol = col
+                                $(document).ready(function () {
+                                    $('#table_id').DataTable({
+                                        order: [12, 'desc'],
+                                        "bDestroy": true,
+                                        responsive: true,
+                                        dom: 'Bfrtip',
+                                        buttons: [
+                                            'copyHtml5',
+                                            'excelHtml5',
+                                            'csvHtml5',
+                                            'pdfHtml5'
+                                        ]
+       
+                                    });
+                                });
+        
+                            }
+
+                           
+     
+                         }) }
+
+            },
+
+
+
+        })
+
+        function arraysEqual(a1,a2) {
+            /* WARNING: arrays must not contain {objects} or behavior may be undefined */
+            return JSON.stringify(a1)==JSON.stringify(a2);
+        }
+
+    </script>
+</body>
+
+</html>
