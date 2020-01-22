@@ -7,16 +7,6 @@
   <title>App</title>
   <link rel="stylesheet" href="../Content/bootstrap.min.css" crossorigin="anonymous">
   <Style>
-    #notification {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      width: 200px;
-      padding: 20px;
-      border-radius: 5px;
-      background-color: white;
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    }
 
     .hidden {
       display: none;
@@ -25,13 +15,13 @@
 </head>
 
 <body>
-  Hi
+  <p id="version"></p>
   <div class="alert alert-primary" id="notification" class="hidden" role="alert">
-    <span id="message"></span>
-    <button id="close-button" onClick="closeNotification()">
+    <p id="message"></p>
+    <button id="close-button" class="btn btn-none" onClick="closeNotification()">
       Close
     </button>
-    <button id="restart-button" onClick="restartApp()" class="hidden">
+    <button id="restart-button" class="btn btn-none" onClick="restartApp()" class="hidden">
       Restart
     </button>
   </div>
@@ -69,6 +59,14 @@
     const message = document.getElementById('message');
     const restartButton = document.getElementById('restart-button');
     var ipcRenderer = require('electron').ipcRenderer
+
+    ipcRenderer.send('app_version');
+    ipcRenderer.on('app_version', (event, arg) => {
+      ipcRenderer.removeAllListeners('app_version');
+      version.innerText = 'Version ' + arg.version;
+    });
+
+
     var app = new Vue({
       el: '#app',
       data() {
@@ -180,6 +178,9 @@
       message.innerText = 'Update Downloaded. It will be installed on restart. Restart now?';
       restartButton.classList.remove('hidden');
       notification.classList.remove('hidden');
+    });
+    ipcMain.on('restart_app', () => {
+      autoUpdater.quitAndInstall();
     });
     function closeNotification() {
       notification.classList.add('hidden');
